@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+        
+    tools {
+    maven 'maven' 
+  }
+
+    stages {
+       stage("Git Checkout"){
+          steps{
+           git 'https://github.com/sriharshabalasa/ajio.git'
+           }
+          }
+          
+           stage("build"){
+          steps{
+           sh "mvn -f flipkart/pom.xml clean package"
+           }
+          }
+        
+        stage ('Deploy') {
+      steps {
+        script {
+          deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://13.233.192.177:8080/')], contextPath: '', onFailure: false, war: 'flipkart/target/*.war' 
+        }
+      }
+    }
+    }
+}
